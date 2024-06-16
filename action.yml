@@ -67,7 +67,6 @@ runs:
         echo "Memory and swap:"
         sudo free
         echo
-        sudo swapon --show
         echo
 
         echo "Available storage:"
@@ -141,8 +140,6 @@ runs:
           # github runners have an active swap file in /mnt/swapfile
           # we want to reuse the temp disk, so first unmount swap and clean the temp disk
           echo "Unmounting and removing swap file."
-          sudo swapoff -a
-          sudo rm -f /mnt/swapfile
 
           echo "Creating LVM Volume."
           echo "  Creating LVM PV on root fs."
@@ -168,11 +165,6 @@ runs:
           # create volume group from these pvs
           sudo vgcreate "${VG_NAME}" "${TMP_LOOP_DEV}" "${ROOT_LOOP_DEV}"
 
-          echo "Recreating swap"
-          # create and activate swap
-          sudo lvcreate -L "${{ inputs.swap-size-mb }}M" -n swap "${VG_NAME}"
-          sudo mkswap "/dev/mapper/${VG_NAME}-swap"
-          sudo swapon "/dev/mapper/${VG_NAME}-swap"
 
           echo "Creating build volume"
           # create and mount build volume
